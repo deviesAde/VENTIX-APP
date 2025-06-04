@@ -3,137 +3,291 @@
 @section('title', 'User Management')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-semibold text-gray-800">User Management</h2>
-        <div class="flex space-x-2">
-            <input type="text" placeholder="Search users..." class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFD586]">
-            <button class="px-4 py-2 bg-[#FF9898] text-white rounded-lg hover:bg-[#FFD586] transition">
-                Search
-            </button>
-        </div>
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h2 class="text-3xl font-bold text-gray-800">User Management</h2>
+        <button onclick="openCreateModal()" class="bg-[#FFAAAA] hover:bg-[#FF9999] text-white px-4 py-2 rounded-lg transition duration-200 flex items-center shadow-md">
+            <i class="fas fa-plus mr-2"></i> Add New User
+        </button>
     </div>
 
-    <div class="bg-white rounded-lg shadow overflow-hidden">
-        <div class="flex justify-between items-center p-4 border-b">
-            <div class="flex space-x-2">
-                <button class="px-4 py-2 bg-[#FFD586] text-gray-800 rounded-lg">All Users</button>
-                <button class="px-4 py-2 bg-white text-gray-800 rounded-lg hover:bg-gray-100">Regular Users</button>
-                <button class="px-4 py-2 bg-white text-gray-800 rounded-lg hover:bg-gray-100">Organizers</button>
-                <button class="px-4 py-2 bg-white text-gray-800 rounded-lg hover:bg-gray-100">Suspended</button>
+    @if(session('success'))
+        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-lg shadow-md">
+            <div class="flex items-center">
+                <i class="fas fa-check-circle mr-2 text-green-500"></i>
+                <p>{{ session('success') }}</p>
             </div>
-            <button class="px-4 py-2 bg-[#FF9898] text-white rounded-lg hover:bg-[#FFD586] transition">
-                Export CSV
-            </button>
         </div>
+    @endif
 
+    @if($errors->any())
+        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-lg shadow-md">
+            <div class="flex items-center">
+                <i class="fas fa-exclamation-circle mr-2 text-red-500"></i>
+                <div>
+                    @foreach ($errors->all() as $error)
+                        <p>{{ $error }}</p>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <div class="bg-white rounded-xl shadow-md overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
+            <table class="min-w-full divide-y divide-gray-200 sm:text-xs">
+                <thead class="bg-[#FFD586]">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">User</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Email</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Role</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @for($i = 0; $i < 5; $i++)
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-10 w-10">
-                                    <img class="h-10 w-10 rounded-full" src="https://via.placeholder.com/40" alt="">
+                    @foreach($users as $user)
+                        <tr class="hover:bg-[#FFF5E6] transition duration-150">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 bg-[#FFAAAA] rounded-full flex items-center justify-center text-white font-bold shadow-sm">
+                                        {{ substr($user->name, 0, 1) }}
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">{{ $user->name }}</div>
+                                        <div class="text-sm text-gray-500">Joined {{ $user->created_at->diffForHumans() }}</div>
+                                    </div>
                                 </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">John Doe</div>
-                                    <div class="text-sm text-gray-500">ID: U12345</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {{ $user->email }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
+                                    {{ $user->role === 'admin' ? 'bg-[#FFAAAA] text-white' : 'bg-[#FFD586] text-gray-800' }}">
+                                    {{ ucfirst($user->role) }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="flex space-x-3">
+                                    <button onclick="openEditModal({{ json_encode($user) }})"
+                                        class="text-[#FF8A65] hover:text-[#FF7043] p-1 rounded-full hover:bg-[#FFE0B2]">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-[#E57373] hover:text-[#EF5350] p-1 rounded-full hover:bg-[#FFCDD2]"
+                                            onclick="return confirm('Are you sure you want to delete this user?')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
                                 </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">john@example.com</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <select class="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#FFD586]">
-                                <option>Regular User</option>
-                                <option>Organizer</option>
-                                <option>Admin</option>
-                            </select>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Active</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            15 Jan 2023
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <div class="flex space-x-2">
-                                <button class="text-[#FF9898] hover:text-[#FFD586]">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                    </svg>
-                                </button>
-                                <button class="text-[#FF9898] hover:text-[#FFD586]">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                    </svg>
-                                </button>
-                                <button class="text-[#FF9898] hover:text-[#FFD586]">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                    </svg>
-                                </button>
-                                <button class="text-red-500 hover:text-red-700">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    @endfor
+                            </td>
+                        </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
+    </div>
 
-        <div class="px-4 py-3 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
-            <div class="flex-1 flex justify-between items-center">
-                <div>
-                    <p class="text-sm text-gray-700">
-                        Showing <span class="font-medium">1</span> to <span class="font-medium">10</span> of <span class="font-medium">97</span> results
-                    </p>
-                </div>
-                <div>
-                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                            <span class="sr-only">Previous</span>
-                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                            </svg>
-                        </a>
-                        <a href="#" aria-current="page" class="z-10 bg-[#FFD586] border-[#FF9898] text-gray-700 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                            1
-                        </a>
-                        <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                            2
-                        </a>
-                        <a href="#" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
-                            3
-                        </a>
-                        <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                            <span class="sr-only">Next</span>
-                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                            </svg>
-                        </a>
-                    </nav>
-                </div>
-            </div>
+    <!-- Pagination -->
+    <div class="mt-6 flex items-center justify-between">
+        <div class="text-sm text-gray-500">
+            Showing {{ $users->firstItem() }} to {{ $users->lastItem() }} of {{ $users->total() }} users
+        </div>
+        <div class="flex space-x-2">
+            {{ $users->onEachSide(1)->links('vendor.pagination.tailwind') }}
         </div>
     </div>
 </div>
+
+<!-- Create User Modal -->
+<div id="createModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <form method="POST" action="{{ route('admin.users.store') }}">
+                @csrf
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-[#FFD586] sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fas fa-user-plus text-[#FF7043]"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">Create New User</h3>
+                            <div class="mt-4 space-y-4">
+                                <div>
+                                    <label for="create_name" class="block text-sm font-medium text-gray-700">Name</label>
+                                    <input type="text" name="name" id="create_name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#FFAAAA] focus:border-[#FFAAAA] sm:text-sm">
+                                </div>
+                                <div>
+                                    <label for="create_email" class="block text-sm font-medium text-gray-700">Email</label>
+                                    <input type="email" name="email" id="create_email" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#FFAAAA] focus:border-[#FFAAAA] sm:text-sm">
+                                </div>
+                                <div>
+                                    <label for="create_password" class="block text-sm font-medium text-gray-700">Password</label>
+                                    <input type="password" name="password" id="create_password" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#FFAAAA] focus:border-[#FFAAAA] sm:text-sm">
+                                </div>
+                                <div>
+                                    <label for="create_role" class="block text-sm font-medium text-gray-700">Role</label>
+                                    <select name="role" id="create_role" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#FFAAAA] focus:border-[#FFAAAA] sm:text-sm">
+                                        <option value="user">user</option>
+                                        <option value="admin">admin</option>
+                                        <option value="organizer">organizer</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-[#FFAAAA] text-base font-medium text-white hover:bg-[#FF9999] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FFAAAA] sm:ml-3 sm:w-auto sm:text-sm">
+                        Create User
+                    </button>
+                    <button type="button" onclick="closeCreateModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FFAAAA] sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div id="editModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <form method="POST" id="editForm">
+                @csrf
+                @method('PUT')
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-[#FFD586] sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fas fa-user-edit text-[#FF7043]"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">Edit User</h3>
+                            <div class="mt-4 space-y-4">
+                                <div>
+                                    <label for="edit_name" class="block text-sm font-medium text-gray-700">Name</label>
+                                    <input type="text" name="name" id="edit_name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#FFAAAA] focus:border-[#FFAAAA] sm:text-sm">
+                                </div>
+                                <div>
+                                    <label for="edit_email" class="block text-sm font-medium text-gray-700">Email</label>
+                                    <input type="email" name="email" id="edit_email" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#FFAAAA] focus:border-[#FFAAAA] sm:text-sm">
+                                </div>
+                                <div>
+                                    <label for="edit_password" class="block text-sm font-medium text-gray-700">Password (leave blank to keep current)</label>
+                                    <input type="password" name="password" id="edit_password" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#FFAAAA] focus:border-[#FFAAAA] sm:text-sm">
+                                </div>
+                                <div>
+                                    <label for="edit_role" class="block text-sm font-medium text-gray-700">Role</label>
+                                    <select name="role" id="edit_role" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#FFAAAA] focus:border-[#FFAAAA] sm:text-sm">
+                                        <option value="user">User</option>
+                                        <option value="admin">Admin</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-[#FFAAAA] text-base font-medium text-white hover:bg-[#FF9999] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FFAAAA] sm:ml-3 sm:w-auto sm:text-sm">
+                        Update User
+                    </button>
+                    <button type="button" onclick="closeEditModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FFAAAA] sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Create Modal Functions
+    function openCreateModal() {
+        document.getElementById('createModal').classList.remove('hidden');
+    }
+
+    function closeCreateModal() {
+        document.getElementById('createModal').classList.add('hidden');
+    }
+
+    // Edit Modal Functions
+    function openEditModal(user) {
+        document.getElementById('editForm').action = `/admin/users/${user.id}`;
+        document.getElementById('edit_name').value = user.name;
+        document.getElementById('edit_email').value = user.email;
+        document.getElementById('edit_role').value = user.role;
+
+        document.getElementById('editModal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').classList.add('hidden');
+    }
+
+    // Close modals when clicking outside
+    window.onclick = function(event) {
+        if (event.target === document.getElementById('createModal')) {
+            closeCreateModal();
+        }
+        if (event.target === document.getElementById('editModal')) {
+            closeEditModal();
+        }
+    }
+</script>
+
+<style>
+    /* Custom Pagination Styles */
+    .pagination {
+        display: flex;
+        list-style: none;
+        padding: 0;
+    }
+
+    .page-item {
+        margin: 0 2px;
+    }
+
+    .page-link {
+        display: block;
+        padding: 0.5rem 0.75rem;
+        color: #4a5568;
+        background-color: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.375rem;
+        transition: all 0.2s;
+    }
+
+    .page-link:hover {
+        background-color: #FFF5E6;
+        border-color: #FFD586;
+    }
+
+    .page-item.active .page-link {
+        background-color: #FFAAAA;
+        border-color: #FFAAAA;
+        color: white;
+    }
+
+    .page-item.disabled .page-link {
+        color: #a0aec0;
+        background-color: #f7fafc;
+        border-color: #e2e8f0;
+        cursor: not-allowed;
+    }
+</style>
 @endsection

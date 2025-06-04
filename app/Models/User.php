@@ -6,6 +6,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Organizer; // Import Organizer model
+
 
 class User extends Authenticatable
 {
@@ -16,6 +18,8 @@ class User extends Authenticatable
      * The attributes that are mass assignable.
      *
      * @var list<string>
+     *
+
      */
     protected $fillable = [
         'name',
@@ -23,7 +27,7 @@ class User extends Authenticatable
         'password',
         'role', // Added role attribute
     ];
-
+    protected $table = 'users';
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -46,4 +50,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function organizer()
+{
+    return $this->hasOne(Organizer::class);
+}
 }

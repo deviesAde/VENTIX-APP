@@ -1,5 +1,5 @@
 <x-auth-layout>
-    <form method="POST" action="{{ route('register.organizer.store') }}">
+    <form method="POST" action="{{ route('register.organizer.store') }}" enctype="multipart/form-data">
         @csrf
 
         <!-- Name -->
@@ -35,6 +35,35 @@
             <x-input-label for="organization_name" :value="__('Organization Name')" />
             <x-text-input id="organization_name" class="block mt-1 w-full" type="text" name="organization_name" :value="old('organization_name')" required />
             <x-input-error :messages="$errors->get('organization_name')" class="mt-2" />
+        </div>
+
+        <!-- Description -->
+        <div class="mt-4">
+            <x-input-label for="description" :value="__('Description (Optional)')" />
+            <textarea id="description" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" name="description" rows="3">{{ old('description') }}</textarea>
+            <x-input-error :messages="$errors->get('description')" class="mt-2" />
+        </div>
+
+        <!-- Phone -->
+        <div class="mt-4">
+            <x-input-label for="phone" :value="__('Phone Number')" />
+            <x-text-input id="phone" class="block mt-1 w-full" type="text" name="phone" :value="old('phone')" required />
+            <x-input-error :messages="$errors->get('phone')" class="mt-2" />
+        </div>
+
+        <!-- Website -->
+        <div class="mt-4">
+            <x-input-label for="website" :value="__('Website (Optional)')" />
+            <x-text-input id="website" class="block mt-1 w-full" type="url" name="website" :value="old('website')" placeholder="https://example.com" />
+            <x-input-error :messages="$errors->get('website')" class="mt-2" />
+        </div>
+
+        <!-- Logo -->
+        <div class="mt-4">
+            <x-input-label for="logo" :value="__('Logo (Optional)')" />
+            <input id="logo" class="block mt-1 w-full text-gray-600 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 dark:file:bg-gray-700 dark:file:text-gray-200 dark:hover:file:bg-gray-600" type="file" name="logo" accept="image/*" />
+            <x-input-error :messages="$errors->get('logo')" class="mt-2" />
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Max file size: 2MB</p>
         </div>
 
         <div class="flex items-center justify-end mt-4">
