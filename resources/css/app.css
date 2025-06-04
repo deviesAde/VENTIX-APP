@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        /* Warna utama - kuning cerah */
+        --color-primary: 255 213 134; /* FFD586 */
+        --color-primary-dark: 230 190 110; /* Versi lebih gelap */
+
+        /* Warna sekunder - merah muda coral */
+        --color-secondary: 218 108 108; /* DA6C6C */
+        --color-secondary-dark: 198 88 88; /* Versi lebih gelap */
+
+        /* Warna aksen */
+        --color-accent: 108 178 218; /* Biru cerah untuk aksen */
+
+        /* Warna netral */
+        --color-dark: 30 30 30; /* Hitam soft */
+        --color-light: 252 252 252; /* Putih bersih */
+        --color-gray: 156 163 175; /* Gray-400 */
+    }
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+.bg-primary {
+    background-color: #FFD586;
+}
+
+.bg-secondary {
+    background-color: #FF9898;
+}
+
+.text-primary {
+    color: #FFD586;
+}
+
+.text-secondary {
+    color: #FF9898;
+}
+
+.border-primary {
+    border-color: #FFD586;
+}
+
+.border-secondary {
+    border-color: #FF9898;
+}
+
+.hover\:bg-primary:hover {
+    background-color: #FFD586;
+}
+
+.hover\:bg-secondary:hover {
+    background-color: #FF9898;
+}
+
+.focus\:ring-primary:focus {
+    --tw-ring-color: #FFD586;
+}
+
+.focus\:ring-secondary:focus {
+    --tw-ring-color: #FF9898;
+}
+
+/* Animations */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+    animation: float 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
