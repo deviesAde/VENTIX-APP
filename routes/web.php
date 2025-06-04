@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Admin\AdminOrganizerController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminProfileController;
-
+use App\Http\Controllers\Organizer\OrganizerDashboardController;
 
 
 Route::get('/', function () {
@@ -76,9 +76,8 @@ Route::prefix('admin')->middleware(['auth', CheckRole::class.':admin'])->group(f
 });
 
 Route::middleware(['auth', CheckRole::class.':organizer'])->group(function () {
-    Route::get('/organizer/dashboard', [OrganizerController::class, 'index'])->name('organizer.dashboard');
-    //prefix
     Route::prefix('organizer')->group(function () {
+        Route::get('/dashboard', [OrganizerDashboardController::class, 'index'])->name('organizer.dashboard');
 
     });
 });

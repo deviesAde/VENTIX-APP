@@ -121,7 +121,7 @@
     </script>
     @endpush --}}
 
-    <div class="container mx-auto px-4 py-6">
+    {{-- <div class="container mx-auto px-4 py-6">
         <h1 class="text-2xl font-bold mb-4">Admin Dashboard</h1>
 
         <!-- Logout Button -->
@@ -133,4 +133,4 @@
         </form>
     </div>
 
-@endsection
+@endsection --}}
