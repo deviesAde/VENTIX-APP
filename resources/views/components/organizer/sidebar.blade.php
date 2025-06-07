@@ -1,44 +1,66 @@
-<aside class="w-64 bg-[#FFD586] min-h-screen flex flex-col">
-    <div class="p-4 border-b border-[#FFAAAA]">
-        <h2 class="text-xl font-bold text-gray-800">Event Organizer</h2>
+<aside class="w-64 bg-white shadow-md flex-shrink-0 hidden md:block">
+    <div class="p-4 flex items-center space-x-3 border-b border-gray-200">
+        <div class="w-12 h-12 rounded-full bg-[#FFD586] flex items-center justify-center text-white font-bold text-xl">
+            {{ substr(auth()->user()->name, 0, 1) }}
+        </div>
+        <div>
+            <p class="font-semibold">{{ auth()->user()->name }}</p>
+            <p class="text-sm text-gray-500">Organizer</p>
+        </div>
     </div>
-
-    <nav class="flex-1 p-4 space-y-2">
-        <!-- Dashboard -->
-        <a href="{{ route('organizer.dashboard') }}" class="block px-4 py-2 rounded-lg hover:bg-[#FFAAAA] transition {{ request()->routeIs('organizer.dashboard') ? 'bg-[#FFAAAA] font-medium' : '' }}">
+    <nav class="p-4 space-y-2">
+        <x-organizer.sidebar-item
+            href="{{ route('organizer.dashboard') }}"
+            icon="fas fa-tachometer-alt"
+            :active="request()->routeIs('organizer.dashboard')">
             Dashboard
-        </a>
+        </x-organizer.sidebar-item>
 
-        <!-- Event Saya -->
-        <a href="{{ route('organizer.events.index') }}" class="block px-4 py-2 rounded-lg hover:bg-[#FFAAAA] transition {{ request()->routeIs('organizer.events.*') && !request()->routeIs('organizer.events.create') ? 'bg-[#FFAAAA] font-medium' : '' }}">
+        <x-organizer.sidebar-item
+            href="{{ route('organizer.events') }}"
+            icon="fas fa-calendar-alt"
+            :active="request()->routeIs('organizer.events')">
             Event Saya
-        </a>
+        </x-organizer.sidebar-item>
 
-        <!-- Buat Event Baru -->
-        <a href="{{ route('organizer.events.create') }}" class="block px-4 py-2 rounded-lg hover:bg-[#FFAAAA] transition {{ request()->routeIs('organizer.events.create') ? 'bg-[#FFAAAA] font-medium' : '' }}">
+        <x-organizer.sidebar-item
+            href="{{ route('organizer.events.create') }}"
+            icon="fas fa-plus-circle"
+            :active="request()->routeIs('organizer.events.create')">
             Buat Event Baru
-        </a>
+        </x-organizer.sidebar-item>
 
-        <!-- Statistik Penjualan -->
-        <a href="{{ route('organizer.statistics') }}" class="block px-4 py-2 rounded-lg hover:bg-[#FFAAAA] transition {{ request()->routeIs('organizer.statistics') ? 'bg-[#FFAAAA] font-medium' : '' }}">
+        <x-organizer.sidebar-item
+            href="{{ route('organizer.statistics') }}"
+            icon="fas fa-chart-bar"
+            :active="request()->routeIs('organizer.statistics')">
             Statistik Penjualan
-        </a>
+        </x-organizer.sidebar-item>
 
-        <!-- Profil Saya -->
-        <a href="{{ route('organizer.profile') }}" class="block px-4 py-2 rounded-lg hover:bg-[#FFAAAA] transition {{ request()->routeIs('organizer.profile') ? 'bg-[#FFAAAA] font-medium' : '' }}">
+        <x-organizer.sidebar-item
+            href="{{ route('organizer.tickets') }}"
+            icon="fas fa-ticket-alt"
+            :active="request()->routeIs('organizer.tickets')">
+            Tiket Saya
+        </x-organizer.sidebar-item>
+
+        <x-organizer.sidebar-item
+            href="{{ route('organizer.profile') }}"
+            icon="fas fa-user"
+            :active="request()->routeIs('organizer.profile')">
             Profil Saya
-        </a>
-    </nav>
+        </x-organizer.sidebar-item>
 
-    <div class="p-4 border-t border-[#FFAAAA]">
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button type="submit" class="w-full text-left px-4 py-2 rounded-lg hover:bg-[#FFAAAA] transition flex items-center space-x-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                <span>Logout</span>
-            </button>
-        </form>
-    </div>
+        <div class="mt-8 border-t border-gray-200 pt-4">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <x-organizer.sidebar-item
+                    href="{{ route('logout') }}"
+                    icon="fas fa-sign-out-alt"
+                    onclick="event.preventDefault(); this.closest('form').submit();">
+                    Logout
+                </x-organizer.sidebar-item>
+            </form>
+        </div>
+    </nav>
 </aside>

@@ -77,9 +77,33 @@ Route::prefix('admin')->middleware(['auth', CheckRole::class.':admin'])->group(f
 
 Route::middleware(['auth', CheckRole::class.':organizer'])->group(function () {
     Route::prefix('organizer')->group(function () {
-        Route::get('/dashboard', [OrganizerDashboardController::class, 'index'])->name('organizer.dashboard');
+        Route::get('/dashboard', function() {
+            return view('organizer.dashboard');
+        })->name('organizer.dashboard');
+
+        Route::get('/events', function() {
+            return view('organizer.events');
+        })->name('organizer.events');
+
+        Route::get('/events/create', function() {
+            return view('organizer.create-event');
+        })->name('organizer.events.create');
+        Route::post('/events/create', [OrganizerDashboardController::class, 'storeEvent'])->name('organizer.events.store');
+
+        Route::get('/statistics', function() {
+            return view('organizer.statistics');
+        })->name('organizer.statistics');
+
+        Route::get('/profile', function() {
+            return view('organizer.profile');
+        })->name('organizer.profile');
+
+        Route::get('/tickets', function() {
+            return view('organizer.tickets');
+        })->name('organizer.tickets');
 
     });
+
 });
 
 Route::middleware(['auth', CheckRole::class.':user'])->group(function () {

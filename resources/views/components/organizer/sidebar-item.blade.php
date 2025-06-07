@@ -1,4 +1,4 @@
-@props(['href' => '#', 'icon' => ' fa-circle', 'active' => false])
+@props(['href' => '#', 'icon' => '', 'active' => false])
 
 <a href="{{ $href }}"
    {{ $attributes->merge(['class' => 'group relative flex items-center space-x-3 p-3 rounded-lg transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 hover:shadow-lg active:scale-95 ' . ($active ? 'bg-[#FF9898] text-white shadow-md scale-105' : 'text-gray-600 hover:bg-[#FFD586] hover:text-gray-800')]) }}>

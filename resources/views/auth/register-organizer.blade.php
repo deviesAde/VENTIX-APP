@@ -40,10 +40,16 @@
         <!-- Description -->
         <div class="mt-4">
             <x-input-label for="description" :value="__('Description (Optional)')" />
-            <textarea id="description" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" name="description" rows="3">{{ old('description') }}</textarea>
+            <x-textarea
+            id="description"
+            name="description"
+            label="Description (Optional)"
+            placeholder="Tell us about your organization..."
+            :error="$errors->has('description')"
+            rows="4"
+        />
             <x-input-error :messages="$errors->get('description')" class="mt-2" />
         </div>
-
         <!-- Phone -->
         <div class="mt-4">
             <x-input-label for="phone" :value="__('Phone Number')" />

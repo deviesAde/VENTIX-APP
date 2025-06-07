@@ -14,15 +14,17 @@ return new class extends Migration
     {
         Schema::create('events', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('organizer_id')->constrained()->onDelete('cascade'); // Relasi ke tabel organizers
+            $table->unsignedBigInteger('organizer_id');
             $table->string('title');
             $table->text('description')->nullable();
             $table->string('location');
-            $table->dateTime('start_time');
-            $table->dateTime('end_time');
-            $table->string('banner_path')->nullable(); // Banner acara
-            $table->enum('status', ['draft', 'published', 'cancelled'])->default('draft'); // Status acara
+            $table->datetime('start_time');
+            $table->datetime('end_time');
+            $table->string('banner_path')->nullable();
+            $table->enum('status', ['draft', 'published'])->default('published');
             $table->timestamps();
+
+            $table->foreign('organizer_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

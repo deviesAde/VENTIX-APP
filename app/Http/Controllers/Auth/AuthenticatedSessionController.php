@@ -24,16 +24,14 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        // Autentikasi pengguna
+
         $request->authenticate();
 
-        // Regenerasi sesi untuk keamanan
         $request->session()->regenerate();
 
-        // Ambil role pengguna yang sedang login
         $role = Auth::user()->role;
 
-        // Redirect berdasarkan role
+
         switch ($role) {
             case 'admin':
                 return redirect()->route('admin.dashboard');
@@ -42,7 +40,7 @@ class AuthenticatedSessionController extends Controller
             case 'user':
                 return redirect()->route('user.dashboard');
             default:
-                // Logout jika role tidak valid
+
                 Auth::logout();
                 return redirect()->route('login')->withErrors([
                     'email' => 'Your account role is not authorized to access this system.',

@@ -8,7 +8,8 @@ use App\Models\Organizer;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrganizerStatusChanged;
 
 
 class AdminOrganizerController extends Controller
@@ -18,10 +19,19 @@ class AdminOrganizerController extends Controller
     {
         // Filter berdasarkan status jika ada
         $status = $request->get('status');
+        $search = $request->get('search'); // Ambil input pencarian
         $query = Organizer::query();
 
         if ($status) {
             $query->where('status', $status);
+        }
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('organization_name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%");
+            });
         }
 
         // Pagination
@@ -57,6 +67,9 @@ class AdminOrganizerController extends Controller
             'status'  => 'approved',
         ]);
 
+        // Kirim email notifikasi
+        Mail::to($organizer->email)->send(new OrganizerStatusChanged($organizer, 'approved'));
+
         return redirect()->route('admin.organizers.index')
             ->with('success', 'Organizer berhasil disetujui!');
     }
@@ -78,6 +91,9 @@ class AdminOrganizerController extends Controller
         $organizer->update([
             'status' => 'rejected',
         ]);
+
+        // Kirim email notifikasi
+        Mail::to($organizer->email)->send(new OrganizerStatusChanged($organizer, 'rejected'));
 
         return redirect()->route('admin.organizers.index')
             ->with('success', 'Organizer berhasil ditolak!');

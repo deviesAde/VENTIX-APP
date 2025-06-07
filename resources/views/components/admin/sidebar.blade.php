@@ -57,17 +57,7 @@
                     </div>
                 </div>
 
-                <!-- Additional quick action buttons -->
-                <div class="grid grid-cols-2 gap-2">
-                    <a href="#" class="p-2 text-xs text-center bg-white/50 hover:bg-white/80 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md">
-                        <i class="fas fa-plus-circle text-[#FF9898] mb-1"></i>
-                        <div>New Event</div>
-                    </a>
-                    <a href="#" class="p-2 text-xs text-center bg-white/50 hover:bg-white/80 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md">
-                        <i class="fas fa-user-plus text-[#FF9898] mb-1"></i>
-                        <div>Add User</div>
-                    </a>
-                </div>
+               
             </div>
         </div>
 

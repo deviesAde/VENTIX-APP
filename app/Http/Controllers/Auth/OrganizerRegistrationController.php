@@ -38,7 +38,7 @@ class OrganizerRegistrationController extends Controller
         'logo'              => ['nullable', 'image', 'max:2048'], // max 2MB
     ]);
 
-    // Handle upload logo jika ada
+
     $logoPath = null;
     if ($request->hasFile('logo')) {
         $file = $request->file('logo');
@@ -54,10 +54,10 @@ class OrganizerRegistrationController extends Controller
         'website'           => $request->website,
         'logo_path'         => $logoPath,
         'status'            => 'pending',
-        'email'             => $request->email, // Simpan email untuk validasi
+        'email'             => $request->email,
     ]);
 
     return redirect()->route('login')
-        ->with('success', 'Pendaftaran sebagai organizer berhasil! Tunggu persetujuan admin.');
+    ->with('success', 'Pendaftaran berhasil! Tunggu admin untuk meng-ACC dan cek email Anda secara berkala.');
 }
 }

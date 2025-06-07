@@ -13,11 +13,15 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('event_id')->constrained()->onDelete('cascade'); // Relasi ke tabel events
-            $table->string('type'); // Jenis tiket (misalnya: VIP, Regular)
-            $table->integer('quantity'); // Jumlah tiket yang tersedia
-            $table->decimal('price', 10, 2); // Harga tiket
+            $table->unsignedBigInteger('event_id');
+            $table->string('ticket_type');
+            $table->decimal('price', 10, 2);
+            $table->integer('quantity');
+            $table->enum('status', ['available', 'sold_out'])->default('available');
+            $table->date('end_date');
             $table->timestamps();
+
+            $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
         });
     }
 
