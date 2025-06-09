@@ -1,12 +1,21 @@
 <aside class="w-64 bg-white shadow-md flex-shrink-0 hidden md:block">
     <div class="p-4 flex items-center space-x-3 border-b border-gray-200">
-        <div class="w-12 h-12 rounded-full bg-[#FFD586] flex items-center justify-center text-white font-bold text-xl">
-            {{ substr(auth()->user()->name, 0, 1) }}
+        <div class="flex items-center space-x-3">
+            @if(auth()->user()->organizer && auth()->user()->organizer->logo_path)
+                <img src="{{ asset('storage/' . auth()->user()->organizer->logo_path) }}"
+                     alt="Logo Organizer"
+                     class="w-12 h-12 rounded-full object-cover shadow-md" />
+            @else
+                <div class="w-12 h-12 rounded-full bg-[#FFD586] flex items-center justify-center text-white font-bold text-xl">
+                    {{ substr(auth()->user()->name, 0, 1) }}
+                </div>
+            @endif
+            <div>
+                <p class="font-semibold">{{ auth()->user()->name }}</p>
+                <p class="text-sm text-gray-500">Organizer</p>
+            </div>
         </div>
-        <div>
-            <p class="font-semibold">{{ auth()->user()->name }}</p>
-            <p class="text-sm text-gray-500">Organizer</p>
-        </div>
+       
     </div>
     <nav class="p-4 space-y-2">
         <x-organizer.sidebar-item
@@ -37,12 +46,6 @@
             Statistik Penjualan
         </x-organizer.sidebar-item>
 
-        <x-organizer.sidebar-item
-            href="{{ route('organizer.tickets') }}"
-            icon="fas fa-ticket-alt"
-            :active="request()->routeIs('organizer.tickets')">
-            Tiket Saya
-        </x-organizer.sidebar-item>
 
         <x-organizer.sidebar-item
             href="{{ route('organizer.profile') }}"

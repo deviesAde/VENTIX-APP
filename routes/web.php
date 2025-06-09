@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Organizer\SalesStatsController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
@@ -11,6 +12,9 @@ use App\Http\Controllers\Admin\AdminOrganizerController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminProfileController;
 use App\Http\Controllers\Organizer\OrganizerDashboardController;
+use App\Http\Controllers\Organizer\OrganizerProfileController;
+
+
 
 
 Route::get('/', function () {
@@ -64,7 +68,6 @@ Route::prefix('admin')->middleware(['auth', CheckRole::class.':admin'])->group(f
     Route::get('/users', [AdminUserController::class, 'index'])->name('admin.users.index');
     Route::get('/users/create', [AdminUserController::class, 'create'])->name('admin.users.create');
     Route::post('/users', [AdminUserController::class, 'store'])->name('admin.users.store');
-    Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('admin.users.edit');
     Route::put('/users/{id}', [AdminUserController::class, 'update'])->name('admin.users.update');
     Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
 
@@ -77,30 +80,22 @@ Route::prefix('admin')->middleware(['auth', CheckRole::class.':admin'])->group(f
 
 Route::middleware(['auth', CheckRole::class.':organizer'])->group(function () {
     Route::prefix('organizer')->group(function () {
-        Route::get('/dashboard', function() {
-            return view('organizer.dashboard');
-        })->name('organizer.dashboard');
-
-        Route::get('/events', function() {
-            return view('organizer.events');
-        })->name('organizer.events');
-
-        Route::get('/events/create', function() {
-            return view('organizer.create-event');
-        })->name('organizer.events.create');
+        Route::get('/dashboard', [OrganizerDashboardController::class, 'dashboard'])->name('organizer.dashboard');
+        Route::get('/events', [OrganizerDashboardController::class, 'index'])->name('organizer.events');
+        Route::put('/events/{id}', [OrganizerDashboardController::class, 'update'])->name('organizer.events.update');
+        Route::get('/events/create', [OrganizerDashboardController::class, 'create'])->name('organizer.events.create');
         Route::post('/events/create', [OrganizerDashboardController::class, 'storeEvent'])->name('organizer.events.store');
 
-        Route::get('/statistics', function() {
-            return view('organizer.statistics');
-        })->name('organizer.statistics');
 
-        Route::get('/profile', function() {
-            return view('organizer.profile');
-        })->name('organizer.profile');
+        Route::get('/profile', [OrganizerProfileController::class, 'edit'])->name('organizer.profile');
+        Route::put('/profile/update', [OrganizerProfileController::class, 'update'])->name('organizer.profile.update');
 
-        Route::get('/tickets', function() {
-            return view('organizer.tickets');
-        })->name('organizer.tickets');
+
+        //stats
+        Route::get('/stats', [SalesStatsController::class, 'index'])->name('organizer.statistics');
+
+        //delete
+        Route::delete('/events/{id}', [OrganizerDashboardController::class, 'destroy'])->name('organizer.events.destroy');
 
     });
 

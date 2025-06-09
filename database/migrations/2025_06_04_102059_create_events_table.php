@@ -21,7 +21,14 @@ return new class extends Migration
             $table->datetime('start_time');
             $table->datetime('end_time');
             $table->string('banner_path')->nullable();
+
+            $table->enum('event_type', ['free', 'paid'])->default('free');
+            $table->integer('ticket_quantity')->nullable(); // hanya untuk 'paid'
+            $table->decimal('ticket_price', 10, 2)->nullable(); // hanya untuk 'paid'
+
             $table->enum('status', ['draft', 'published'])->default('published');
+            $table->enum('category', ['music', 'seminar', 'sports', 'technology', 'art'])->default('music');
+
             $table->timestamps();
 
             $table->foreign('organizer_id')->references('id')->on('users')->onDelete('cascade');

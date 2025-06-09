@@ -26,18 +26,14 @@ class OrganizerRegistrationController extends Controller
      */
     public function store(Request $request)
 {
-    // Validasi input
     $request->validate([
-        'name'              => ['required', 'string', 'max:255'],
-        'email'             => ['required', 'string', 'email', 'max:255', 'unique:organizers,email'], // Validasi email hanya di tabel organizers
-        'password'          => ['required', 'confirmed', 'min:8'],
+        'email'             => ['required', 'string', 'email', 'max:255', 'unique:organizers,email'],
         'organization_name' => ['required', 'string', 'max:255'],
         'description'       => ['nullable', 'string'],
         'phone'             => ['required', 'string', 'max:20'],
         'website'           => ['nullable', 'url', 'max:255'],
-        'logo'              => ['nullable', 'image', 'max:2048'], // max 2MB
+        'logo'              => ['nullable', 'image', 'max:2048'],
     ]);
-
 
     $logoPath = null;
     if ($request->hasFile('logo')) {
@@ -46,7 +42,6 @@ class OrganizerRegistrationController extends Controller
         $logoPath = $file->storeAs('organizer-logos', $filename, 'public');
     }
 
-    // Simpan data organizer dengan status pending
     Organizer::create([
         'organization_name' => $request->organization_name,
         'description'       => $request->description,
@@ -58,6 +53,7 @@ class OrganizerRegistrationController extends Controller
     ]);
 
     return redirect()->route('login')
-    ->with('success', 'Pendaftaran berhasil! Tunggu admin untuk meng-ACC dan cek email Anda secara berkala.');
+        ->with('success', 'Pendaftaran berhasil! Tunggu admin untuk meng-ACC dan cek email Anda secara berkala.');
 }
+
 }

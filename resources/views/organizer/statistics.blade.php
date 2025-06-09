@@ -9,9 +9,9 @@
         <div class="flex space-x-2">
             <select class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF9898] focus:border-transparent">
                 <option>Semua Event</option>
-                <option>Konser Jazz Night</option>
-                <option>Tech Conference 2023</option>
-                <option>Food Festival</option>
+                @foreach($events as $event)
+                <option value="{{ $event->id }}">{{ $event->title }}</option>
+                @endforeach
             </select>
             <select class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF9898] focus:border-transparent">
                 <option>Bulan Ini</option>
@@ -26,45 +26,45 @@
         <div class="bg-white rounded-lg shadow p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-gray-500">Total Penjualan</p>
-                    <h3 class="text-3xl font-bold">1,245</h3>
+                    <p class="text-gray-500">Total Event</p>
+                    <h3 class="text-3xl font-bold">{{ number_format($totalEvents) }}</h3>
                 </div>
                 <div class="w-12 h-12 rounded-full bg-[#FF9898] bg-opacity-20 flex items-center justify-center">
-                    <i class="fas fa-ticket-alt text-[#FF9898]"></i>
+                    <i class="fas fa-calendar text-[#FF9898]"></i>
                 </div>
             </div>
             <div class="mt-4 pt-4 border-t border-gray-200">
-                <p class="text-sm text-gray-500">Naik <span class="text-green-500">12%</span> dari bulan lalu</p>
+                <p class="text-sm text-gray-500">Total event berbayar</p>
             </div>
         </div>
 
         <div class="bg-white rounded-lg shadow p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-gray-500">Total Pendapatan</p>
-                    <h3 class="text-3xl font-bold">Rp 25.750.000</h3>
+                    <p class="text-gray-500">Total Tiket Tersedia</p>
+                    <h3 class="text-3xl font-bold">{{ number_format($totalTickets) }}</h3>
                 </div>
                 <div class="w-12 h-12 rounded-full bg-[#FFD586] bg-opacity-20 flex items-center justify-center">
-                    <i class="fas fa-money-bill-wave text-[#FFD586]"></i>
+                    <i class="fas fa-ticket-alt text-[#FFD586]"></i>
                 </div>
             </div>
             <div class="mt-4 pt-4 border-t border-gray-200">
-                <p class="text-sm text-gray-500">Naik <span class="text-green-500">8%</span> dari bulan lalu</p>
+                <p class="text-sm text-gray-500">Total kuota tiket</p>
             </div>
         </div>
 
         <div class="bg-white rounded-lg shadow p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-gray-500">Rata-rata Harga Tiket</p>
-                    <h3 class="text-3xl font-bold">Rp 20.682</h3>
+                    <p class="text-gray-500">Pendapatan Potensial</p>
+                    <h3 class="text-3xl font-bold">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</h3>
                 </div>
                 <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
-                    <i class="fas fa-tag text-purple-500"></i>
+                    <i class="fas fa-money-bill-wave text-purple-500"></i>
                 </div>
             </div>
             <div class="mt-4 pt-4 border-t border-gray-200">
-                <p class="text-sm text-gray-500">Turun <span class="text-red-500">3%</span> dari bulan lalu</p>
+                <p class="text-sm text-gray-500">Jika semua tiket terjual</p>
             </div>
         </div>
     </div>
@@ -73,50 +73,105 @@
     <div class="bg-white rounded-lg shadow p-6">
         <h3 class="text-lg font-semibold mb-4 text-gray-800">Grafik Penjualan</h3>
         <div class="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
-            <p class="text-gray-500">Grafik penjualan akan ditampilkan disini</p>
+            @if($chartData->count() > 0)
+                <canvas id="salesChart"></canvas>
+                <script>
+                    const ctx = document.getElementById('salesChart').getContext('2d');
+                    const chartData = @json($chartData);
+
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: chartData.map(item => item.month),
+                            datasets: [{
+                                label: 'Tiket Tersedia',
+                                data: chartData.map(item => item.tickets),
+                                backgroundColor: 'rgba(255, 152, 152, 0.2)',
+                                borderColor: 'rgba(255, 152, 152, 1)',
+                                borderWidth: 2,
+                                tension: 0.1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                </script>
+            @else
+                <p class="text-gray-500">Tidak ada data penjualan</p>
+            @endif
         </div>
     </div>
 
-    <!-- Daftar Tiket Terjual -->
+    <!-- Daftar Event -->
     <div class="bg-white rounded-lg shadow overflow-hidden">
         <div class="p-6 border-b border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-800">Detail Penjualan</h3>
+            <h3 class="text-lg font-semibold text-gray-800">Daftar Event</h3>
         </div>
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Tiket</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Harga</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Terjual</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Event</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Harga Tiket</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kuota</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pendapatan</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @foreach([
-                        ['name' => 'Early Bird', 'price' => 'Rp 75.000', 'sold' => '350', 'revenue' => 'Rp 26.250.000'],
-                        ['name' => 'Reguler', 'price' => 'Rp 100.000', 'sold' => '520', 'revenue' => 'Rp 52.000.000'],
-                        ['name' => 'VIP', 'price' => 'Rp 250.000', 'sold' => '120', 'revenue' => 'Rp 30.000.000'],
-                        ['name' => 'VVIP', 'price' => 'Rp 500.000', 'sold' => '50', 'revenue' => 'Rp 25.000.000']
-                    ] as $ticket)
+                    @forelse($events as $event)
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-900">{{ $ticket['name'] }}</div>
+                            <div class="text-sm font-medium text-gray-900">{{ $event->title }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">{{ $ticket['price'] }}</div>
+                            <div class="text-sm text-gray-900">
+                                @if($event->event_type === 'paid')
+                                    Rp {{ number_format($event->ticket_price, 0, ',', '.') }}
+                                @else
+                                    Gratis
+                                @endif
+                            </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">{{ $ticket['sold'] }}</div>
+                            <div class="text-sm text-gray-900">
+                                @if($event->event_type === 'paid')
+                                    {{ number_format($event->ticket_quantity) }}
+                                @else
+                                    Unlimited
+                                @endif
+                            </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-semibold text-[#FF9898]">{{ $ticket['revenue'] }}</div>
+                            <div class="text-sm font-semibold text-[#FF9898]">
+                                @if($event->event_type === 'paid')
+                                    Rp {{ number_format($event->ticket_quantity * $event->ticket_price, 0, ',', '.') }}
+                                @else
+                                    Rp 0
+                                @endif
+                            </div>
                         </td>
                     </tr>
-                    @endforeach
+                    @empty
+                    <tr>
+                        <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
+                            Belum ada event berbayar
+                        </td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+@endpush
 @endsection

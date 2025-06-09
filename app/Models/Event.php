@@ -16,7 +16,11 @@ class Event extends Model
         'start_time',
         'end_time',
         'banner_path',
+        'event_type',
+        'ticket_quantity',
+        'ticket_price',
         'status',
+        'category',
     ];
 
     // Relasi ke Organizer
@@ -25,8 +29,5 @@ class Event extends Model
         return $this->belongsTo(Organizer::class);
     }
 
-    public function tickets()
-{
-    return $this->hasMany(Ticket::class);
-}
+
 }

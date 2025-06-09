@@ -43,36 +43,39 @@ class AdminOrganizerController extends Controller
     /**
      * Approve organizer.
      */
-    public function approve($id, Request $request)
-    {
-        $organizer = Organizer::findOrFail($id);
+    public function approve($id)
+{
+    $organizer = Organizer::findOrFail($id);
 
-        // Cek apakah email sudah ada di tabel users
-        if (User::where('email', $organizer->email)->exists()) {
-            return redirect()->route('admin.organizers.index')
-                ->with('error', 'Email sudah digunakan oleh user lain!');
-        }
-
-        // Buat user di tabel users
-        $user = User::create([
-            'name'     => $organizer->organization_name,
-            'email'    => $organizer->email,
-            'password' => Hash::make($request->password),
-            'role'     => 'organizer',
-        ]);
-
-        // Update organizer dengan user_id dan status
-        $organizer->update([
-            'user_id' => $user->id,
-            'status'  => 'approved',
-        ]);
-
-        // Kirim email notifikasi
-        Mail::to($organizer->email)->send(new OrganizerStatusChanged($organizer, 'approved'));
-
+    // Cek apakah email sudah ada di tabel users
+    if (User::where('email', $organizer->email)->exists()) {
         return redirect()->route('admin.organizers.index')
-            ->with('success', 'Organizer berhasil disetujui!');
+            ->with('error', 'Email sudah digunakan oleh user lain!');
     }
+
+    // Generate password acak
+    $password = Str::random(8);
+
+    // Buat user
+    $user = User::create([
+        'name'     => $organizer->organization_name,
+        'email'    => $organizer->email,
+        'password' => Hash::make($password),
+        'role'     => 'organizer',
+    ]);
+
+    // Update organizer
+    $organizer->update([
+        'user_id' => $user->id,
+        'status'  => 'approved',
+    ]);
+
+    // Kirim email notifikasi
+    Mail::to($organizer->email)->send(new OrganizerStatusChanged($organizer, 'approved', $password));
+
+    return redirect()->route('admin.organizers.index')
+        ->with('success', 'Organizer berhasil disetujui! Password telah dikirim melalui email.');
+}
 
     /**
      * Reject organizer.
@@ -81,19 +84,12 @@ class AdminOrganizerController extends Controller
     {
         $organizer = Organizer::findOrFail($id);
 
-        // Cek apakah organizer sudah disetujui
-        if ($organizer->status === 'approved') {
-            return redirect()->route('admin.organizers.index')
-                ->with('error', 'Organizer yang sudah disetujui tidak dapat ditolak!');
-        }
-
-        // Update status menjadi rejected
         $organizer->update([
             'status' => 'rejected',
         ]);
 
-        // Kirim email notifikasi
-        Mail::to($organizer->email)->send(new OrganizerStatusChanged($organizer, 'rejected'));
+        // Kirim email penolakan (tanpa password)
+        Mail::to($organizer->email)->send(new OrganizerStatusChanged($organizer, 'rejected', null));
 
         return redirect()->route('admin.organizers.index')
             ->with('success', 'Organizer berhasil ditolak!');

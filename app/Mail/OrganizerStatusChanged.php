@@ -12,14 +12,20 @@ class OrganizerStatusChanged extends Mailable
 
     public $organizer;
     public $status;
+    public $password;
+    public $subject = 'Status Pendaftaran Organizer Anda';
+
 
     /**
      * Create a new message instance.
      */
-    public function __construct($organizer, $status)
+    public function __construct($organizer, $status, $password)
     {
         $this->organizer = $organizer;
         $this->status = $status;
+        $this->password = $password;
+
+
     }
 
     /**
@@ -32,6 +38,7 @@ class OrganizerStatusChanged extends Mailable
                     ->with([
                         'organizer' => $this->organizer,
                         'status' => $this->status,
+
                     ]);
     }
 }
