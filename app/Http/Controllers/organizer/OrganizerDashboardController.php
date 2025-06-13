@@ -52,6 +52,15 @@ class OrganizerDashboardController extends Controller
         'category'        => $request->category,
     ]);
 
+    if ($request->ajax()) {
+        // Jika request AJAX, kembalikan response JSON
+        return response()->json([
+            'success' => true,
+            'message' => 'Event berhasil dibuat'
+        ]);
+    }
+
+    // Jika request biasa, redirect
     return redirect()->route('organizer.dashboard')->with('success', 'Event berhasil dibuat!');
 }
 public function dashboard()
@@ -59,10 +68,9 @@ public function dashboard()
     {
         $organizerId = Auth::id();
 
-        // Get total events count
         $totalEvents = Event::where('organizer_id', $organizerId)->count();
 
-        // Calculate tickets sold and revenue only for paid events
+
         $paidEvents = Event::where('organizer_id', $organizerId)
             ->where('event_type', 'paid')
             ->get();
@@ -72,14 +80,14 @@ public function dashboard()
             return $event->ticket_quantity * $event->ticket_price;
         });
 
-        // Get upcoming events (next 30 days)
         $upcomingEvents = Event::where('organizer_id', $organizerId)
             ->where('start_time', '>=', now())
             ->where('start_time', '<=', now()->addDays(30))
             ->orderBy('start_time')
             ->get()
             ->map(function($event) {
-                // Convert start_time to Carbon instance if it's not already
+                // Convert
+
                 $startTime = is_string($event->start_time)
                     ? Carbon::parse($event->start_time)
                     : $event->start_time;
@@ -169,8 +177,6 @@ public function destroy($id)
 }
 
 //profile
-
-
 
 }
 

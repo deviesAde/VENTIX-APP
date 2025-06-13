@@ -2,6 +2,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Event;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -10,6 +12,26 @@ class UserController extends Controller
      */
     public function index()
     {
-        return view('user.dashboard'); // Create a Blade file: resources/views/user/dashboard.blade.php
+        $events = Event::where('status', 'published')
+            ->with('organizer')
+            ->orderBy('start_time', 'asc')
+            ->paginate(12);
+
+        return view('user.dashboard', compact('events'));
     }
+
+    public function show(Event $event)
+    {
+        $isRegistered = false;
+
+        if (Auth::check()) {  // Proper way to check authentication
+            $isRegistered = $event->attendees()->where('user_id', Auth::id())->exists();
+        }
+
+        return view('user.show', [
+            'event' => $event,
+            'isRegistered' => $isRegistered
+        ]);
+    }
+
 }

@@ -6,8 +6,10 @@
     <title>Organizer Dashboard - @yield('title')</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     @stack('styles')
 </head>
+
 <body class="bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 font-sans antialiased">
     <!-- Alert Container -->
     <div id="alert-container" class="fixed top-4 right-4 z-50 space-y-2"></div>

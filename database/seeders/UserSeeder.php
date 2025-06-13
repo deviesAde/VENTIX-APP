@@ -17,13 +17,8 @@ class UserSeeder extends Seeder
             'role' => 'admin',
         ]);
 
-        // Organizer
-        User::create([
-            'name' => 'Organizer User',
-            'email' => 'organizer@gmail.com',
-            'password' => Hash::make('password'),
-            'role' => 'organizer',
-        ]);
+     
+
 
         // Regular User
         User::create([

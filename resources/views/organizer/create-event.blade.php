@@ -9,7 +9,7 @@
             Buat Event Baru
         </h1>
 
-        <form action="{{ route('organizer.events.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <form id="eventForm" action="{{ route('organizer.events.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
 
             <!-- Judul Event -->
@@ -73,13 +73,18 @@
                 <label for="banner" class="block text-sm font-semibold text-gray-700">
                     Banner Event
                 </label>
-                <div class="flex items-center justify-center w-full">
+                <div class="flex flex-col items-center">
+                    <!-- Preview Image Container -->
+                    <div id="imagePreview" class="mb-4 hidden">
+                        <img id="previewImage" class="max-w-full h-48 rounded-lg object-cover border border-gray-200">
+                    </div>
+
                     <label for="banner" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition duration-200">
                         <div class="flex flex-col items-center justify-center pt-5 pb-6">
                             <svg class="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
                             </svg>
-                            <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> banner event</p>
+                            <p id="fileLabel" class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> banner event</p>
                             <p class="text-xs text-gray-500">PNG, JPG atau JPEG (MAX. 5MB)</p>
                         </div>
                         <input id="banner" name="banner" type="file" class="hidden" accept="image/*" />
@@ -186,9 +191,27 @@
     </div>
 </div>
 
+<!-- Success Modal -->
+<div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <div class="text-center">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-2" id="successTitle">Event Berhasil Dibuat!</h3>
+            <p class="text-gray-600 mb-6" id="successMessage">Event Anda telah berhasil disimpan.</p>
+            <button id="closeSuccessModal" class="px-6 py-2 bg-[#FF9898] text-white rounded-lg hover:bg-[#ff7f7f] transition duration-200">
+                Tutup
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
-    // Toggle ticket section based on event type
     document.addEventListener('DOMContentLoaded', function() {
+        // Toggle ticket section based on event type
         const eventTypeRadios = document.querySelectorAll('input[name="event_type"]');
         const ticketSection = document.getElementById('ticket-section');
         const ticketQuantity = document.getElementById('ticket_quantity');
@@ -209,16 +232,129 @@
                 }
             });
         });
-    });
 
-    // File upload preview (optional enhancement)
-    document.getElementById('banner').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const label = e.target.parentElement;
-            const fileName = file.name;
-            label.querySelector('p').innerHTML = `<span class="font-semibold text-[#FF9898]">File selected:</span> ${fileName}`;
-        }
+        // Image preview functionality
+        const bannerInput = document.getElementById('banner');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewImage = document.getElementById('previewImage');
+        const fileLabel = document.getElementById('fileLabel');
+
+        bannerInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Validate file type
+                const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Hanya file JPG, JPEG atau PNG yang diizinkan');
+                    this.value = '';
+                    return;
+                }
+
+                // Validate file size (5MB max)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Ukuran file maksimal 5MB');
+                    this.value = '';
+                    return;
+                }
+
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    previewImage.src = event.target.result;
+                    imagePreview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+
+                // Update label
+                fileLabel.innerHTML = `<span class="font-semibold text-[#FF9898]">File dipilih:</span> ${file.name}`;
+            } else {
+                imagePreview.classList.add('hidden');
+                fileLabel.innerHTML = '<span class="font-semibold">Click to upload</span> banner event';
+            }
+        });
+
+        const eventForm = document.getElementById('eventForm');
+        const successModal = document.getElementById('successModal');
+        const successTitle = document.getElementById('successTitle');
+        const successMessage = document.getElementById('successMessage');
+        const closeSuccessModal = document.getElementById('closeSuccessModal');
+
+        eventForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const submitButton = document.activeElement;
+            const isDraft = submitButton.name === 'draft';
+
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.innerHTML = isDraft ? '⏳ Menyimpan...' : '⏳ Mempublikasikan...';
+
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        }
+            })
+            .then(response => {
+                // Handle redirect response
+                if (response.redirected) {
+                    window.location.href = response.url;
+                    return;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data) return; // Skip if redirected
+
+                if (data.success) {
+                    // Show success modal
+                    successTitle.textContent = isDraft ? 'Draft Berhasil Disimpan!' : 'Event Berhasil Dipublikasikan!';
+                    successMessage.textContent = isDraft ?
+                        'Event Anda telah disimpan sebagai draft dan dapat diedit nanti.' :
+                        'Event Anda telah berhasil dipublikasikan.';
+
+                    successModal.classList.remove('hidden');
+
+                    // Reset form if not draft
+                    if (!isDraft) {
+                        eventForm.reset();
+                        imagePreview.classList.add('hidden');
+                        fileLabel.innerHTML = '<span class="font-semibold">Click to upload</span> banner event';
+                        ticketSection.classList.add('hidden');
+                    }
+                } else {
+                    // Handle validation errors
+                    if (data.errors) {
+                        let errorMessages = '';
+                        for (const [field, errors] of Object.entries(data.errors)) {
+                            errorMessages += errors.join('<br>') + '<br>';
+                        }
+                        alert('Terjadi kesalahan:\n' + errorMessages);
+                    } else {
+                        alert(data.message || 'Terjadi kesalahan saat menyimpan event.');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat mengirim data.');
+            })
+            .finally(() => {
+                submitButton.disabled = false;
+                submitButton.innerHTML = isDraft ? '📄 Simpan Draft' : '🚀 Publikasikan Event';
+            });
+        });
+
+        // Close modal handler
+        closeSuccessModal.addEventListener('click', function() {
+            successModal.classList.add('hidden');
+            // Redirect setelah menutup modal (jika diperlukan)
+            // window.location.href = "{{ route('organizer.dashboard') }}";
+        });
     });
 </script>
 @endsection

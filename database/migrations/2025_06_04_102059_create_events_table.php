@@ -14,7 +14,10 @@ return new class extends Migration
     {
         Schema::create('events', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('organizer_id');
+
+            // Tambahkan foreign key ke tabel 'organizers'
+            $table->foreignId('organizer_id')->constrained('organizers')->onDelete('cascade');
+
             $table->string('title');
             $table->text('description')->nullable();
             $table->string('location');
@@ -30,8 +33,6 @@ return new class extends Migration
             $table->enum('category', ['music', 'seminar', 'sports', 'technology', 'art'])->default('music');
 
             $table->timestamps();
-
-            $table->foreign('organizer_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

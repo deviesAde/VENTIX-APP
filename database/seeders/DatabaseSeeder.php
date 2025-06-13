@@ -17,5 +17,9 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
 
         ]);
+
+        $this->call([
+            OrganizerSeeder::class,
+        ]);
     }
 }

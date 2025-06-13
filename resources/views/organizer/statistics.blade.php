@@ -5,21 +5,20 @@
 @section('content')
 <div class="space-y-6">
     <div class="flex justify-between items-center">
-        <h2 class="text-2xl font-bold text-gray-800">Statistik Penjualan</h2>
-        <div class="flex space-x-2">
-            <select class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF9898] focus:border-transparent">
-                <option>Semua Event</option>
-                @foreach($events as $event)
-                <option value="{{ $event->id }}">{{ $event->title }}</option>
-                @endforeach
-            </select>
-            <select class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FF9898] focus:border-transparent">
-                <option>Bulan Ini</option>
-                <option>Minggu Ini</option>
-                <option>Hari Ini</option>
-                <option>Kustom</option>
-            </select>
+    
+        <a href="{{ route('organizer.dashboard') }}" class="text-blue-500 hover:text-blue-700">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-chart-line text-gray-600"></i>
+            <span class="text-gray-600">Statistik Penjualan</span>
         </div>
+        <a href="{{ route('organizer.events.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+            <i class="fas fa-plus"></i> Tambah Event
+        </a>
+    </div>
+        <h2 class="text-2xl font-bold text-gray-800">Statistik Penjualan</h2>
+
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">

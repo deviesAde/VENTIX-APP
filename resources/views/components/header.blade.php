@@ -57,10 +57,25 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 transition-transform duration-200 group-hover:scale-110 text-[#FFAA00] dark:text-[#FFD586]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                         </svg>
-                        <span class="text-[#FFAA00] dark:text-[#FFD586] group-hover:text-[#E69500] dark:group-hover:text-[#E6C275] transition-colors duration-300">Dashboard</span>
+                        <span class="text-[#FFAA00] dark:text-[#FFD586] group-hover:text-[#E69500] dark:group-hover:text-[#E6C275] transition-colors duration-300">Halaman Utama</span>
                     </span>
+
+
                     <span class="absolute inset-0 bg-[#FFD586]/20 dark:bg-[#FFAA00]/10 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 scale-95 group-hover:scale-100"></span>
                 </a>
+
+                <form method="POST" action="{{ route('logout') }}" class="inline">
+                    @csrf
+                    <button type="submit" class="relative px-6 py-3 font-medium text-white group">
+                        <span class="relative z-10 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 transition-transform duration-200 group-hover:scale-110 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A7.962 7.962 0 0018 12a7.962 7.962 0 00-.405-3.595L20 7h-5m0 10v2a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2h5a2 2 0 012 2v2m4 4h6m0 0l-3-3m3 3l-3 3" />
+                            </svg>
+                            Logout
+                        </span>
+                        <span class="absolute inset-0 bg-gradient-to-r from-[#FFAA00] to-[#FFAAAA] dark:from-[#FFD586] dark:to-[#FF8F8F] rounded-full shadow-lg transform group-hover:scale-105 transition-all duration-300"></span>
+                    </button>
+                </form> 
                 @else
                     <a href="{{ route('login') }}" class="relative px-5 py-2.5 font-medium text-[#FFAA00] dark:text-[#FFD586] group">
                         <span class="relative z-10">Login</span>

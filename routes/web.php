@@ -59,6 +59,8 @@ Route::prefix('admin')->middleware(['auth', CheckRole::class.':admin'])->group(f
         return redirect('/login');
     })->name('admin.logout');
 
+
+
     Route::get('/organizers', [AdminOrganizerController::class, 'index'])->name('admin.organizers.index');
     Route::post('/organizers/{id}/approve', [AdminOrganizerController::class, 'approve'])->name('admin.organizers.approve');
     Route::post('/organizers/{id}/reject', [AdminOrganizerController::class, 'reject'])->name('admin.organizers.reject');
@@ -86,7 +88,6 @@ Route::middleware(['auth', CheckRole::class.':organizer'])->group(function () {
         Route::get('/events/create', [OrganizerDashboardController::class, 'create'])->name('organizer.events.create');
         Route::post('/events/create', [OrganizerDashboardController::class, 'storeEvent'])->name('organizer.events.store');
 
-
         Route::get('/profile', [OrganizerProfileController::class, 'edit'])->name('organizer.profile');
         Route::put('/profile/update', [OrganizerProfileController::class, 'update'])->name('organizer.profile.update');
 
@@ -102,12 +103,21 @@ Route::middleware(['auth', CheckRole::class.':organizer'])->group(function () {
 });
 
 Route::middleware(['auth', CheckRole::class.':user'])->group(function () {
-    Route::get('/user/dashboard', [UserController::class, 'index'])->name('user.dashboard');
+    route::prefix('user')->group(function () {
+Route::get('/events', [UserController::class, 'index'])->name('user.dashboard');
+Route::get('/events/{event}', [UserController::class, 'show'])->name('events.show');
 
-    // Route::prefix('user')->group(function () {
-    //     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    //     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    //     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+Route::get('/my-events', function () {
+    return view('user.my-events');
+});
+
+Route::get('/profile', function () {
+    return view('user.profile');
+});
+
+    });
+
+
 
 
 });

@@ -55,4 +55,10 @@ class User extends Authenticatable
 {
     return $this->hasOne(Organizer::class);
 }
+public function registeredEvents()
+{
+    return $this->belongsToMany(Event::class, 'event_registrations')
+                ->withPivot('ticket_number', 'status')
+                ->withTimestamps();
+}
 }
