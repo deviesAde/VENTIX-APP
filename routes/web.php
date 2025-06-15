@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminEventController;
 use App\Http\Controllers\Organizer\SalesStatsController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -13,9 +14,8 @@ use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\AdminProfileController;
 use App\Http\Controllers\Organizer\OrganizerDashboardController;
 use App\Http\Controllers\Organizer\OrganizerProfileController;
-
-
-
+use App\Http\Controllers\EventController;
+use App\Models\Organizer;
 
 Route::get('/', function () {
     return view('welcome');
@@ -24,6 +24,8 @@ Route::get('/', function () {
 Route::get('/home', function () {
     return view('welcome');
 })->name('home');
+
+
 
 
 Route::get('/dashboard', function () {
@@ -48,9 +50,7 @@ Route::prefix('admin')->middleware(['auth', CheckRole::class.':admin'])->group(f
     Route::get('/users', function () {
         return view('admin.users.index');
     })->name('admin.users.index');
-    Route::get('/events', function () {
-        return view('admin.events.index');
-    })->name('admin.events.index');
+
     Route::get('/organizers', function () {
         return view('admin.organizers.index');
     })->name('admin.organizers.index');
@@ -59,7 +59,9 @@ Route::prefix('admin')->middleware(['auth', CheckRole::class.':admin'])->group(f
         return redirect('/login');
     })->name('admin.logout');
 
-
+    Route::get('/events', [AdminEventController::class, 'index'])->name('admin.events.index');
+    Route::get('/events/{event}', [AdminEventController::class, 'show'])->name('admin.events.show');
+    Route::delete('/events/{event}', [AdminEventController::class, 'destroy'])->name('admin.events.destroy');
 
     Route::get('/organizers', [AdminOrganizerController::class, 'index'])->name('admin.organizers.index');
     Route::post('/organizers/{id}/approve', [AdminOrganizerController::class, 'approve'])->name('admin.organizers.approve');
@@ -98,18 +100,29 @@ Route::middleware(['auth', CheckRole::class.':organizer'])->group(function () {
         //delete
         Route::delete('/events/{id}', [OrganizerDashboardController::class, 'destroy'])->name('organizer.events.destroy');
 
-    });
-
+        Route::get('/organizer/scan', [OrganizerDashboardController::class, 'showScanPage'])->name('organizer.scan');
+        Route::post('/organizer/verify-ticket', [OrganizerDashboardController::class, 'verifyTicket'])->name('organizer.verify-ticket');
 });
+
+ });
+
 
 Route::middleware(['auth', CheckRole::class.':user'])->group(function () {
-    route::prefix('user')->group(function () {
+route::prefix('user')->group(function () {
 Route::get('/events', [UserController::class, 'index'])->name('user.dashboard');
 Route::get('/events/{event}', [UserController::class, 'show'])->name('events.show');
+// routes/web.php
 
-Route::get('/my-events', function () {
-    return view('user.my-events');
-});
+Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
+Route::post('/events/{event}/register', [EventController::class, 'register'])->name('events.register');
+Route::get('/events/ticket/{registration}', [EventController::class, 'ticket'])->name('events.ticket');
+Route::post('/payment/callback', [EventController::class, 'paymentCallback'])->name('payment.callback');
+Route::get('/payments/{payment}/retry', [EventController::class, 'retryPayment'])->name('payment.retry');
+
+
+
+
+
 
 Route::get('/profile', function () {
     return view('user.profile');

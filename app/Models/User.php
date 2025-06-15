@@ -61,4 +61,8 @@ public function registeredEvents()
                 ->withPivot('ticket_number', 'status')
                 ->withTimestamps();
 }
+public function registrations()
+{
+    return $this->hasMany(EventRegistration::class);
+}
 }

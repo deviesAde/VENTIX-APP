@@ -15,7 +15,7 @@
                 <p class="text-sm text-gray-500">Organizer</p>
             </div>
         </div>
-       
+
     </div>
     <nav class="p-4 space-y-2">
         <x-organizer.sidebar-item
@@ -24,6 +24,14 @@
             :active="request()->routeIs('organizer.dashboard')">
             Dashboard
         </x-organizer.sidebar-item>
+
+         <x-organizer.sidebar-item
+            href="{{ route('organizer.scan') }}"
+            icon="fas fa-tachometer-alt"
+            :active="request()->routeIs('organizer.scan')">
+            Scan
+        </x-organizer.sidebar-item>
+
 
         <x-organizer.sidebar-item
             href="{{ route('organizer.events') }}"

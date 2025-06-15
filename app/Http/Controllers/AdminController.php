@@ -14,7 +14,7 @@ class AdminController extends Controller
      */
     public function index()
     {
-        return view('admin.dashboard'); // Create a Blade file: resources/views/admin/dashboard.blade.php
+        return view('admin.events.index'); // Create a Blade file: resources/views/admin/dashboard.blade.php
     }
 
     public function approveOrganizer($organizerId)

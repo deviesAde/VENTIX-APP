@@ -34,13 +34,17 @@
                         {{ $event->isFree ? 'FREE' : 'Rp ' . number_format($event->ticket_price, 0, ',', '.') }}
                     </div>
                     @if($isRegistered)
-                        <a href="#" class="block bg-[#FF6B6B] text-white text-center px-6 py-2 rounded-md font-medium hover:bg-[#e05555] transition">
+                        <a href="{{ route('events.ticket', auth()->user()->registrations->where('event_id', $event->id)->first()->id) }}"
+                           class="block bg-[#FF6B6B] text-white text-center px-6 py-2 rounded-md font-medium hover:bg-[#e05555] transition">
                             View Ticket
                         </a>
                     @else
-                        <a href="#" class="block bg-[#FF6B6B] text-white text-center px-6 py-2 rounded-md font-medium hover:bg-[#e05555] transition">
-                            Register Now
-                        </a>
+                        <form action="{{ route('events.register', $event) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="w-full bg-[#FF6B6B] text-white text-center px-6 py-2 rounded-md font-medium hover:bg-[#e05555] transition">
+                                Register Now
+                            </button>
+                        </form>
                     @endif
                 </div>
             </div>
@@ -98,46 +102,70 @@
             </div>
 
             @if($isRegistered)
-            <div class="border-t pt-6">
-                <h2 class="text-xl font-bold mb-4">Your Ticket</h2>
-                <div class="bg-[#ffd586e6] bg-opacity-20 p-6 rounded-lg border border-[#ffd586e6]">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <h3 class="font-bold text-lg">{{ $event->title }}</h3>
-                            <p class="text-gray-600">{{ $event->formatted_date }} • {{ $event->formatted_time }}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-sm text-gray-500">Ticket ID</p>
-                            <p class="font-mono font-bold">#{{ rand(100000, 999999) }}</p>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-between items-center mb-6">
-                        <div>
-                            <p class="text-sm text-gray-500">Attendee</p>
-                            <p class="font-medium">{{ auth()->user()->name }}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-sm text-gray-500">Type</p>
-                            <p class="font-medium">{{ $event->isFree ? 'General Admission' : 'VIP' }}</p>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-center mb-4">
-                        <div class="bg-white p-4 rounded">
-                            <!-- QR Code Placeholder -->
-                            <div class="w-32 h-32 bg-gray-200 flex items-center justify-center">
-                                <span class="text-gray-500 text-xs">QR Code</span>
+                @php
+                    $registration = auth()->user()->registrations->where('event_id', $event->id)->first();
+                @endphp
+                <div class="border-t pt-6">
+                    <h2 class="text-xl font-bold mb-4">Your Ticket</h2>
+                    <div class="bg-[#ffd586e6] bg-opacity-20 p-6 rounded-lg border border-[#ffd586e6]">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="font-bold text-lg">{{ $event->title }}</h3>
+                                <p class="text-gray-600">{{ $event->formatted_date }} • {{ $event->formatted_time }}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">Ticket ID</p>
+                                <p class="font-mono font-bold">{{ $registration->ticket_number }}</p>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="text-center">
-                        <p class="text-sm text-gray-600 mb-2">Show this ticket at the entrance</p>
-                        <button class="text-[#FF6B6B] font-medium hover:underline">Download Ticket</button>
+                        <div class="flex justify-between items-center mb-6">
+                            <div>
+                                <p class="text-sm text-gray-500">Attendee</p>
+                                <p class="font-medium">{{ auth()->user()->name }}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">Status</p>
+                                <p class="font-medium capitalize">{{ $registration->status }}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-center mb-4">
+                            <div class="bg-white p-4 rounded">
+                                <!-- QR Code -->
+                                <div class="w-32 h-32 flex items-center justify-center">
+                                    {!! $registration->generateQrCode() !!}
+                                </div>
+                            </div>
+                        </div>
+
+                        @if($registration->status === 'pending')
+                        <div class="text-center py-4 bg-yellow-50 rounded mb-4">
+                            <p class="text-yellow-700">Your payment is still pending. Please complete the payment to confirm your registration.</p>
+                            @if($registration->payment)
+                                <a href="{{ route('payment.retry', $registration->payment->id) }}"
+                                   class="mt-2 inline-block bg-[#FF6B6B] text-white px-4 py-2 rounded-md font-medium hover:bg-[#e05555] transition">
+                                    Complete Payment
+                                </a>
+                            @endif
+                        </div>
+                        @endif
+
+                        <div class="text-center">
+                            <p class="text-sm text-gray-600">Show this ticket at the entrance</p>
+                            <button class="text-[#FF6B6B] font-medium hover:underline mt-2" id="download-ticket">Download Ticket</button>
+                        </div>
                     </div>
                 </div>
-            </div>
+
+                <script>
+                    document.getElementById('download-ticket').addEventListener('click', function(e) {
+                        e.preventDefault();
+                        // Implement download functionality here
+                        // You can use html2canvas or similar library to capture the ticket as image
+                        alert('Download functionality will be implemented here');
+                    });
+                </script>
             @endif
         </div>
     </div>

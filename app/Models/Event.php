@@ -29,6 +29,10 @@ class Event extends Model
         return $this->belongsTo(Organizer::class);
     }
 
+    protected $casts = [
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
+    ];
     public function attendees()
 {
     return $this->belongsToMany(User::class, 'event_registrations')
@@ -38,7 +42,7 @@ class Event extends Model
 
 public function registrations()
 {
-    return $this->hasMany(Registration::class);
+    return $this->hasMany(EventRegistration::class);
 }
 
 
