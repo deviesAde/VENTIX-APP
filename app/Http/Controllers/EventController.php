@@ -26,12 +26,11 @@ class EventController extends Controller
     public function register(Request $request, Event $event)
     {
         try {
-            // Cek duplikasi registrasi
+
             if ($event->registrations()->where('user_id', Auth::id())->exists()) {
                 return back()->with('error', 'Anda sudah terdaftar untuk event ini');
             }
 
-            // Buat registrasi
             $registration = EventRegistration::create([
                 'event_id' => $event->id,
                 'user_id' => Auth::id(),
@@ -99,30 +98,34 @@ class EventController extends Controller
 
     public function paymentCallback(Request $request)
     {
-        $serverKey = config('services.midtrans.server_key');
-        $hashed = hash("sha512",
-            $request->order_id .
-            $request->status_code .
-            $request->gross_amount .
-            $serverKey
-        );
+        Log::info('Callback Received:', $request->all());
 
-        if ($hashed == $request->signature_key) {
-            $registration = EventRegistration::with('payment')
-                ->where('ticket_number', $request->order_id)
-                ->first();
+        // Skip verification in development
+        if (!app()->environment('production')) {
+            $registration = EventRegistration::where('ticket_number', $request->order_id)->first();
 
             if ($registration) {
-                if (in_array($request->transaction_status, ['capture', 'settlement'])) {
-                    $registration->update(['status' => 'confirmed']);
-                    $registration->payment->update(['status' => 'paid']);
-                    Log::info('Payment confirmed via callback', ['registration_id' => $registration->id]);
-                }
+                $registration->update(['status' => 'confirmed']);
+                $registration->payment?->update(['status' => 'paid']);
+                return response()->json(['status' => 'success']);
             }
+
+            return response()->json(['status' => 'error'], 404);
+        }
+
+        // Production verification
+        $serverKey = config('services.midtrans.server_key');
+        $hashed = hash("sha512", $request->order_id.$request->status_code.$request->gross_amount.$serverKey);
+
+        if ($hashed == $request->signature_key && $request->transaction_status == 'settlement') {
+            $registration = EventRegistration::where('ticket_number', $request->order_id)->first();
+            $registration?->update(['status' => 'confirmed']);
+            $registration->payment?->update(['status' => 'paid']);
         }
 
         return response()->json(['status' => 'success']);
     }
+
 
     public function retryPayment(Payment $payment)
     {
@@ -167,5 +170,7 @@ class EventController extends Controller
         }
     }
 
-    
+
+
+
 }

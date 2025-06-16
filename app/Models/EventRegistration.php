@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
 class EventRegistration extends Model
 {
 
-    protected $fillable = ['event_id', 'user_id', 'ticket_number', 'status' ,];
+    protected $fillable = ['event_id', 'user_id', 'ticket_number', 'status' , 'checked_in_at', ];
 
     public function event()
     {
@@ -28,20 +28,23 @@ class EventRegistration extends Model
 
     public function payment()
     {
-        return $this->hasOne(Payment::class);
+        return $this->hasOne(Payment::class, 'event_registration_id');
     }
 
-    public function getQrCodeBase64()
+
+    public function generateQrCode()
     {
-        return 'data:image/png;base64,' . base64_encode(
-            QrCode::format('png')
-                ->size(200)
-                ->generate(json_encode([
-                    'event_id' => $this->event_id,
-                    'ticket_number' => $this->ticket_number,
-                    'user_id' => $this->user_id
-                ]))
-        );
+
+        $data = [
+            'event_id' => $this->event_id,
+            'registration_id' => $this->id,
+            'ticket_number' => $this->ticket_number,
+            'user_id' => $this->user_id
+        ];
+
+        $qrCode = QrCode::size(200)->generate(json_encode($data));
+
+        return $qrCode;
     }
 
     /**

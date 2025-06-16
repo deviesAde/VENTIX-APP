@@ -65,4 +65,9 @@ public function registrations()
 {
     return $this->hasMany(EventRegistration::class);
 }
+public function events()
+{
+    return $this->belongsToMany(Event::class, 'event_registrations', 'user_id', 'event_id')
+                ->withTimestamps();
+}
 }

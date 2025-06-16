@@ -91,10 +91,7 @@
         @endforeach
     </div>
 
-    <div class="relative">
-        <input type="text" placeholder="Search events..."
-               class="w-full md:w-96 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6B6B]">
-    </div>
+  
 </div>
 
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

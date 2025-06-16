@@ -12,83 +12,13 @@ use Carbon\Carbon;
 use App\Models\EventRegistration;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+
 
 
 class OrganizerDashboardController extends Controller
 {
-
-
-    public function showScanPage()
-{
-    return view('organizer.scan'); // Halaman scanner
-}
-public function verifyTicket(Request $request)
-{
-    $validator = Validator::make($request->all(), [
-        'ticket_code' => 'required|string',
-        'proof_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Validation error',
-            'errors' => $validator->errors()
-        ], 422);
-    }
-
-    DB::beginTransaction();
-    try {
-        $ticket = EventRegistration::with(['user', 'event'])
-            ->where('ticket_number', $request->ticket_code)
-            ->firstOrFail();
-
-        if ($ticket->isCheckedIn()) {
-            return response()->json([
-                'status' => 'warning',
-                'message' => 'Ticket already checked in',
-                'data' => $this->formatTicketData($ticket)
-            ]);
-        }
-
-        $ticket->checkIn($request->file('proof_image'));
-        DB::commit();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Check-in successful',
-            'data' => $this->formatTicketData($ticket)
-        ]);
-
-    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-        DB::rollBack();
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Ticket not found'
-        ], 404);
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return response()->json([
-            'status' => 'error',
-            'message' => 'An error occurred',
-            'error' => $e->getMessage()
-        ], 500);
-    }
-}
-
-    private function formatTicketData($ticket)
-    {
-        return [
-            'ticket' => $ticket,
-            'user' => $ticket->user,
-            'event' => $ticket->event,
-            'checked_in_at' => $ticket->checked_in_at?->format('Y-m-d H:i:s'),
-            'proof_image_url' => $ticket->proof_image_url,
-            'remaining_tickets' => $ticket->event->ticket_quantity,
-            'qr_code' => $ticket->getQrCodeBase64()
-        ];
-    }
 
 
 

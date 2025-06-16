@@ -15,7 +15,9 @@ use App\Http\Controllers\Admin\AdminProfileController;
 use App\Http\Controllers\Organizer\OrganizerDashboardController;
 use App\Http\Controllers\Organizer\OrganizerProfileController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\UserProfileController;
 use App\Models\Organizer;
+use App\Http\Controllers\EventRegistrationController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -99,9 +101,12 @@ Route::middleware(['auth', CheckRole::class.':organizer'])->group(function () {
 
         //delete
         Route::delete('/events/{id}', [OrganizerDashboardController::class, 'destroy'])->name('organizer.events.destroy');
+        Route::get('/scan', [EventRegistrationController::class, 'showScanner'])->name('organizer.scan');
+    Route::post('/scan/verify', [EventRegistrationController::class, 'verifyTicket'])->name('organizer.scan.verify');
+    Route::post('/scan/check-in', [EventRegistrationController::class, 'checkIn'])->name('organizer.scan.check-in');
+    Route::get('/scan/manual', [EventRegistrationController::class, 'showManualEntry'])->name('organizer.scan.manual');
+    Route::post('/scan/manual', [EventRegistrationController::class, 'processManualEntry'])->name('organizer.scan.manual.process');
 
-        Route::get('/organizer/scan', [OrganizerDashboardController::class, 'showScanPage'])->name('organizer.scan');
-        Route::post('/organizer/verify-ticket', [OrganizerDashboardController::class, 'verifyTicket'])->name('organizer.verify-ticket');
 });
 
  });
@@ -110,7 +115,6 @@ Route::middleware(['auth', CheckRole::class.':organizer'])->group(function () {
 Route::middleware(['auth', CheckRole::class.':user'])->group(function () {
 route::prefix('user')->group(function () {
 Route::get('/events', [UserController::class, 'index'])->name('user.dashboard');
-Route::get('/events/{event}', [UserController::class, 'show'])->name('events.show');
 // routes/web.php
 
 Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
@@ -118,20 +122,18 @@ Route::post('/events/{event}/register', [EventController::class, 'register'])->n
 Route::get('/events/ticket/{registration}', [EventController::class, 'ticket'])->name('events.ticket');
 Route::post('/payment/callback', [EventController::class, 'paymentCallback'])->name('payment.callback');
 Route::get('/payments/{payment}/retry', [EventController::class, 'retryPayment'])->name('payment.retry');
+;
 
 
 
 
 
-
-Route::get('/profile', function () {
-    return view('user.profile');
+Route::get('/profile', [UserProfileController::class, 'show'])->name('profile');
+Route::put('/profile', [UserProfileController::class, 'update'])->name('profile.update');
+});
 });
 
-    });
 
 
 
-
-});
 require __DIR__.'/auth.php';

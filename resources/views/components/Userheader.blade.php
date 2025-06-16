@@ -21,20 +21,10 @@
                 </a>
             </div>
 
-            <!-- Search Bar (Center) -->
-            <div class="flex-1 max-w-xl mx-4 hidden md:block">
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
-                    </div>
-                    <input type="text" class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-[#3A3A3A] rounded-full bg-white/50 dark:bg-[#3A3A3A]/50 focus:outline-none focus:ring-2 focus:ring-[#FFAA00] dark:focus:ring-[#FFD586] focus:border-transparent transition-all duration-200" placeholder="Cari event...">
-                </div>
-            </div>
+
 
             <!-- User Navigation -->
-          
+
                 <!-- User Profile Dropdown -->
                 <div class="relative ml-4" id="profile-dropdown">
                     <div id="profile-toggle" class="flex items-center space-x-2 cursor-pointer group">
@@ -63,9 +53,15 @@
                             <p class="text-sm text-gray-500 truncate dark:text-gray-400">{{ Auth::user()->email }}</p>
                         </div>
                         <div class="py-1">
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-[#4A4A4A] transition">Dashboard</a>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-[#4A4A4A] transition">Tiket Saya</a>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-[#4A3A3A] transition">Favorit</a>
+                            <div class="dropdown-menu">
+                                <a href="{{ route('user.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-[#4A4A4A] transition duration-150 ease-in-out">
+                                    <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+                                </a>
+                                <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-[#4A4A4A] transition duration-150 ease-in-out">
+                                    <i class="fas fa-ticket-alt mr-2"></i> Tiket Saya
+                                </a>
+
+                            </div>
                         </div>
                         <div class="py-1">
                             <form method="POST" action="{{ route('logout') }}">

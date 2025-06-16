@@ -56,24 +56,37 @@
 
 <script src="https://app.sandbox.midtrans.com/snap/snap.js"
         data-client-key="{{ config('services.midtrans.client_key') }}"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        window.snap.pay('{{ $snapToken }}', {
-            onSuccess: function(result) {
-                window.location.href = '{{ route('events.ticket', $registration->id) }}';
-            },
-            onPending: function(result) {
-                window.location.href = '{{ route('events.ticket', $registration->id) }}?status=confirmed';
-            },
-            onError: function(result) {
-                alert("Pembayaran gagal: " + result.status_message);
-                window.location.href = '{{ route('events.show', $event->id) }}';
-            },
-            onClose: function() {
-
-                alert("Anda menutup halaman pembayaran. Silakan lanjutkan pembayaran sebelum batas waktu habis.");
-            }
-        });
-    });
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                window.snap.pay('{{ $snapToken }}', {
+                    onSuccess: function(result) {
+                        fetch('/user/registration/{{ $registration->id }}/manual-check')
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.status === 'settlement' || data.status === 'capture') {
+                                    window.location.href = '{{ route('events.ticket', $registration->id) }}';
+                                } else {
+                                    alert("Pembayaran belum dikonfirmasi.");
+                                    window.location.href = '{{ route('events.ticket', $registration->id) }}';
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error saat cek manual:', error);
+                                window.location.href = '{{ route('events.ticket', $registration->id) }}';
+                            });
+                    },
+                    onPending: function(result) {
+                        alert("Pembayaran masih pending.");
+                        window.location.href = '{{ route('events.ticket', $registration->id) }}';
+                    },
+                    onError: function(result) {
+                        alert("Pembayaran gagal: " + result.status_message);
+                        window.location.href = '{{ route('events.show', $event->id) }}';
+                    },
+                    onClose: function() {
+                        alert("Anda menutup halaman pembayaran. Silakan lanjutkan pembayaran sebelum batas waktu habis.");
+                    }
+                });
+            });
 </script>
 @endsection
