@@ -113,7 +113,7 @@ class EventController extends Controller
             return response()->json(['status' => 'error'], 404);
         }
 
-        // Production verification
+  
         $serverKey = config('services.midtrans.server_key');
         $hashed = hash("sha512", $request->order_id.$request->status_code.$request->gross_amount.$serverKey);
 

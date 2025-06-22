@@ -46,9 +46,8 @@ Route::get('/dashboard', function () {
 
 
 Route::prefix('admin')->middleware(['auth', CheckRole::class.':admin'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
+    Route::get('/dashboard', [AdminProfileController::class, 'index'])->name('admin.dashboard');
+    
     Route::get('/users', function () {
         return view('admin.users.index');
     })->name('admin.users.index');

@@ -7,12 +7,55 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\Organizer;
+use App\Models\Event;
+use App\Models\Payment;
 
 class AdminProfileController extends Controller
 {
     /**
      * Tampilkan halaman edit profil.
      */
+
+     public function index()
+     {
+         $user = Auth::user();
+         $organizerCount = Organizer::count();
+         $eventCount = Event::count();
+         $paymentCount = Payment::where('status', 'pending')->count();
+
+         // Get organizers count by month
+         $organizersByMonth = Organizer::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
+             ->whereYear('created_at', date('Y'))
+             ->groupBy('month')
+             ->orderBy('month')
+             ->get()
+             ->pluck('count', 'month')
+             ->toArray();
+
+         // Get events count by month
+         $eventsByMonth = Event::selectRaw('MONTH(created_at) as month, COUNT(*) as count')
+             ->whereYear('created_at', date('Y'))
+             ->groupBy('month')
+             ->orderBy('month')
+             ->get()
+             ->pluck('count', 'month')
+             ->toArray();
+
+         // Fill in missing months with 0
+         $allMonths = range(1, 12);
+         $organizersData = array_replace(array_fill_keys($allMonths, 0), $organizersByMonth);
+         $eventsData = array_replace(array_fill_keys($allMonths, 0), $eventsByMonth);
+
+         return view('admin.dashboard', compact(
+             'user',
+             'organizerCount',
+             'eventCount',
+             'paymentCount',
+             'organizersData',
+             'eventsData'
+         ));
+     }
     public function edit()
     {
         $user = Auth::user();

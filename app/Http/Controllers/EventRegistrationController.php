@@ -81,11 +81,9 @@ class EventRegistrationController extends Controller
 
         $registration->checkIn();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Ticket checked in successfully',
-            'checked_in_at' => $registration->checked_in_at->format('Y-m-d H:i:s')
-        ]);
+        return back()->with('success', 'Ticket checked in successfully at ' . $registration->checked_in_at->format('Y-m-d H:i:s'));
+    
+
     }
 
     /**

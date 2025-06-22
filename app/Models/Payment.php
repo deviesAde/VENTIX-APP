@@ -12,7 +12,12 @@ class Payment extends Model
         'payment_method',
         'status',
         'transaction_id',
+        'snap_token',
+        'paid_at',
+        'created_at',
+        'updated_at',
     ];
+
 
     public function eventRegistration()
     {
